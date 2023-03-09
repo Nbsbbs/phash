@@ -7,37 +7,23 @@ class Hasher
     // compare hash strings (no rotation)
     // this assumes the strings will be the same length, which they will be
     // as hashes.
-    public function getSimilarityHamming($hash1, $hash2, $precision = 1): float
+    public function getSimilarityHamming(string $hash1, string $hash2, $precision = 1): float
     {
-        if (is_array($hash1)) {
-            $similarity = count($hash1);
+        $similarity = strlen($hash1);
 
-            // take the hamming distance between the hashes.
-            foreach ($hash1 as $key => $val) {
-                if ($hash1[$key] != $hash2[$key]) {
-                    $similarity--;
-                }
+        // take the hamming distance between the strings.
+        for ($i = 0; $i < strlen($hash1); $i++) {
+            if ($hash1[$i] != $hash2[$i]) {
+                $similarity--;
             }
-            $percentage = round(($similarity / count($hash1) * 100), $precision);
-            return $percentage;
         }
-        if (is_string($hash1)) {
-            $similarity = strlen($hash1);
 
-            // take the hamming distance between the strings.
-            for ($i = 0; $i < strlen($hash1); $i++) {
-                if ($hash1[$i] != $hash2[$i]) {
-                    $similarity--;
-                }
-            }
-
-            $percentage = round(($similarity / strlen($hash1) * 100), $precision);
-            return $percentage;
-        }
+        $percentage = round(($similarity / strlen($hash1) * 100), $precision);
+        return $percentage;
     }
 
     /* return a perceptual hash as a string. Hex or binary. */
-    public function hashAsString(array $hash, $hex = true)
+    public function hashAsString(array $hash, $hex = true): string
     {
         $i = 0;
         $bucket = null;
