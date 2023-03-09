@@ -2,6 +2,7 @@
     "name": "nbsbbs/phash",
     "description": "Counts perceptual hash of images",
     "type": "library",
+    "version": "1.0",
     "autoload": {
         "psr-4": {
             "Nbsbbs\\Phash\\": "src/"
