@@ -4,312 +4,6 @@ namespace Nbsbbs\Phash;
 
 class Hasher
 {
-    protected $bitCounts = [
-        0,
-        1,
-        1,
-        2,
-        1,
-        2,
-        2,
-        3,
-        1,
-        2,
-        2,
-        3,
-        2,
-        3,
-        3,
-        4,
-        1,
-        2,
-        2,
-        3,
-        2,
-        3,
-        3,
-        4,
-        2,
-        3,
-        3,
-        4,
-        3,
-        4,
-        4,
-        5,
-        1,
-        2,
-        2,
-        3,
-        2,
-        3,
-        3,
-        4,
-        2,
-        3,
-        3,
-        4,
-        3,
-        4,
-        4,
-        5,
-        2,
-        3,
-        3,
-        4,
-        3,
-        4,
-        4,
-        5,
-        3,
-        4,
-        4,
-        5,
-        4,
-        5,
-        5,
-        6,
-        1,
-        2,
-        2,
-        3,
-        2,
-        3,
-        3,
-        4,
-        2,
-        3,
-        3,
-        4,
-        3,
-        4,
-        4,
-        5,
-        2,
-        3,
-        3,
-        4,
-        3,
-        4,
-        4,
-        5,
-        3,
-        4,
-        4,
-        5,
-        4,
-        5,
-        5,
-        6,
-        2,
-        3,
-        3,
-        4,
-        3,
-        4,
-        4,
-        5,
-        3,
-        4,
-        4,
-        5,
-        4,
-        5,
-        5,
-        6,
-        3,
-        4,
-        4,
-        5,
-        4,
-        5,
-        5,
-        6,
-        4,
-        5,
-        5,
-        6,
-        5,
-        6,
-        6,
-        7,
-        1,
-        2,
-        2,
-        3,
-        2,
-        3,
-        3,
-        4,
-        2,
-        3,
-        3,
-        4,
-        3,
-        4,
-        4,
-        5,
-        2,
-        3,
-        3,
-        4,
-        3,
-        4,
-        4,
-        5,
-        3,
-        4,
-        4,
-        5,
-        4,
-        5,
-        5,
-        6,
-        2,
-        3,
-        3,
-        4,
-        3,
-        4,
-        4,
-        5,
-        3,
-        4,
-        4,
-        5,
-        4,
-        5,
-        5,
-        6,
-        3,
-        4,
-        4,
-        5,
-        4,
-        5,
-        5,
-        6,
-        4,
-        5,
-        5,
-        6,
-        5,
-        6,
-        6,
-        7,
-        2,
-        3,
-        3,
-        4,
-        3,
-        4,
-        4,
-        5,
-        3,
-        4,
-        4,
-        5,
-        4,
-        5,
-        5,
-        6,
-        3,
-        4,
-        4,
-        5,
-        4,
-        5,
-        5,
-        6,
-        4,
-        5,
-        5,
-        6,
-        5,
-        6,
-        6,
-        7,
-        3,
-        4,
-        4,
-        5,
-        4,
-        5,
-        5,
-        6,
-        4,
-        5,
-        5,
-        6,
-        5,
-        6,
-        6,
-        7,
-        4,
-        5,
-        5,
-        6,
-        5,
-        6,
-        6,
-        7,
-        5,
-        6,
-        6,
-        7,
-        6,
-        7,
-        7,
-        8,
-    ];
-
-    function bitCount(int $num)
-    {
-        $count = 0;
-        for (; $num > 0; $num >>= 8) {
-            $count += $this->bitCounts[($num & 0xff)];
-        }
-        return $count;
-    }
-
-    /**
-     * |---------------------------------------------------------------------
-     * | Returns a percentage similarity using the bitCount method.
-     * | This should be similar to but faster than hamming distance but
-     * | will not work out of the box for scales above 8x8
-     * |---------------------------------------------------------------------
-     *
-     * @return int percentage similarity
-     */
-    public function getSimilarity($hash1, $hash2, $method = 'HAMMING')
-    {
-        switch ($method) {
-            case "HAMMING":
-                return $this->getSimilarityHamming($hash1, $hash2);
-            case "BITS":
-                return $this->getSimilarityBits($hash1, $hash2);
-            default:
-                throw new \InvalidArgumentException('Invalid comparison method');
-        }
-    }
-
-    public function getSimilarityBits($hash1, $hash2)
-    {
-        if (is_array($hash1)) {
-            $hash1 = hexdec($this->hashAsString($hash1));
-            $hash2 = hexdec($this->hashAsString($hash2));
-        } elseif (is_string($hash1)) {
-            //convert to float
-            $hash1 = (int) $hash1;
-            $hash2 = (int) $hash2;
-        }
-        //Get count of bits that are set in $hash1 or $hash2 but not both are set
-        $count = $this->bitCount(abs($hash1 ^ $hash2));
-        //subtract count to get similar bits, and use to compute percentage similarity
-        $result = ((64 - $count) / 64.0) * 100;
-        return (int) $result;
-    }
-
     // compare hash strings (no rotation)
     // this assumes the strings will be the same length, which they will be
     // as hashes.
@@ -369,7 +63,7 @@ class Hasher
      * | Please note that this method returns an image object
      * |----------------------------------------------------------------------
      */
-    public function makeThumbnail($img, $thumbwidth, $thumbheight, $width, $height)
+    public function makeThumbnail($img, int $thumbwidth, int $thumbheight, int $width, int $height)
     {
         if ($width >= $height) {
             $newheight = $thumbheight;
@@ -399,31 +93,20 @@ class Hasher
      * | Accepts PNG or JPEG images
      * |---------------------------------------------------------------------
      *
-     * @param string full path to the file
-     * @return computed hash
+     * @param string $filepath full path to the file
+     * @param int $scale
+     * @return array
      */
-    public function getHash($filepath): array
+    public function getHash(string $filepath, int $scale = 16): array
     {
-        $scale = 8;//todo, allow scale specification
         $product = $scale * $scale;
         $img = file_get_contents($filepath);
         if (!$img) {
-            return 'failed to load ' . $filepath;
+            throw new \RuntimeException('File cannot be read');
         }
         $img = imagecreatefromstring($img);
         if (!$img) {
-            // error, unsupported format.
-            $supportedFormats = '';
-            $needle = 'Support';
-            $needleLen = strlen($needle);
-            foreach (gd_info() as $key => $val) {
-                if (!$val || strlen($key) <= $needleLen || substr($key, -$needleLen) !== $needle) {
-                    continue;
-                }
-                $supportedFormats .= trim(substr($key, 0, strlen($key) - $needleLen)) . ', ';
-            }
-            $supportedFormats = rtrim($supportedFormats, ', ');
-            return 'the image format is not supported. supported formats: ' . $supportedFormats;
+            throw new \RuntimeException('Image cannot be read');
         }
 
         //test image for same size
@@ -453,104 +136,17 @@ class Hasher
         }
         $averageValue /= $product;
         $averageValue = floor($averageValue);
-        $hash = 0;
 
         $phash = array_fill(0, $product, 0);
         for ($i = 0; $i < $product; $i++) {
-            $rgb = $grayscale[$i];
-            if ($rgb >= $averageValue) {
-                $this->leftShift($phash, 1, ($product - $i));
+            if ($grayscale[$i] >= $averageValue) {
+                $phash[$i] = 1;
             }
         }
 
         #free memory
         imagedestroy($img);
-        var_dump($phash);
         return $phash;
-    }
-
-    /**
-     * |----------------------------------------------------------------
-     * | Performs a left shift on the supplied binary array
-     * |----------------------------------------------------------------
-     *
-     * @param array binary array to perform shift on
-     * @param int integer value to shift
-     * @param int amount of places to left shift
-     */
-    function leftShift(&$bin, $val, $places)
-    {
-        if ($places < 1) {
-            return;
-        }
-        $bin[count($bin) - $places] = $val;
-    }
-
-    /**
-     * |-----------------------------------------------------------------
-     * | Converts supplied bin array to decimal
-     * |-----------------------------------------------------------------
-     *
-     * @param array supplied binary array
-     * @return int converted decimal
-     */
-    function oldBin2Dec($bin)
-    {
-        $length = count($bin);
-        $sum = 0;
-        //convert using doubling
-        for ($i = 0; $i < $length; $i++) {
-            //use string_add if doubling bigger than int32
-            if ($i >= 16) {
-                $sum = $this->string_add("$sum", "$sum");
-                $cr = $bin[$i];
-                if ($cr != 0) {
-                    $sum = $this->string_add($sum, "$cr");
-                }
-            } else {
-                $sum += $sum + $bin[$i];
-            }
-        }
-        return $sum;
-    }
-
-    /**
-     * |-----------------------------------------------------------------
-     * | Adds any two decimals regardless of their length to bypass int
-     * | limitations in PHP
-     * |-----------------------------------------------------------------
-     *
-     * @param int number 1
-     * @param int number 2
-     * @return string result
-     */
-    function string_add($a, $b)
-    {
-        $lena = strlen($a);
-        $lenb = strlen($b);
-        if ($lena == $lenb) {
-            $len = $lena - 1; //any
-        } elseif ($lena > $lenb) {
-            $b = str_pad($b, $lena, "0", STR_PAD_LEFT);
-            $len = $lena - 1;
-        } elseif ($lenb > $lena) {
-            $a = str_pad($a, $lenb, "0", STR_PAD_RIGHT);
-            $len = $lenb - 1;
-        }
-        $result = "";
-        for ($i = $len, $carry = 0; $i >= 0 || $carry != 0; $i--) {
-            $add1 = $i < 0 ? 0 : $a[$i];
-            $add2 = $i < 0 ? 0 : $b[$i];
-            $add = $add1 + $add2 + $carry;
-            if ($add > 9) {
-                $carry = 1;
-                $add -= 10;
-            } else {
-                $carry = 0;
-            }
-            $result .= $add;
-        }
-        return strrev($result);
     }
 
     public function fastimagecopyresampled(&$dst_image, $src_image, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h, $quality = 3)
